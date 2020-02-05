@@ -41,7 +41,8 @@ class PopDialogHandler:
         return self._app.top_window().Static.window_text()
 
     def _extract_entrust_id(self, content):
-        return re.search(r"\d+", content).group()
+        # 同花顺新版本中，委托号不再是纯数字。
+        return re.search(r"\w+", content, re.ASCII).group()
 
     def _submit_by_click(self):
         try:
