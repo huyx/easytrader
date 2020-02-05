@@ -425,6 +425,9 @@ class ClientTrader(IClientTrader):
             price_control.set_edit_text(limit_price)
 
     def _get_grid_data(self, control_id):
+        # 同花顺客户端：拷贝数据时需要窗口在前端。
+        self.main.set_focus()
+
         return self.grid_strategy_instance.get(control_id)
 
     def _type_keys(self, control_id, text):
