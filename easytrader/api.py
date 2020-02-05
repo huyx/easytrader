@@ -58,6 +58,11 @@ def use(broker, debug=False, **kwargs):
 
         return ClientTrader()
 
+    if broker.lower() in ["haitong", "海通客户端"]:
+        from .haitong_clienttrader import HaitongClientTrader
+
+        return HaitongClientTrader()
+
     raise NotImplementedError
 
 
