@@ -58,7 +58,7 @@ class IClientTrader(abc.ABC):
 
 
 class ClientTrader(IClientTrader):
-    _editor_need_type_keys = False
+    editor_need_type_keys = False
     # The strategy to use for getting grid data
     grid_strategy: Type[grid_strategies.IGridStrategy] = grid_strategies.Copy
     _grid_strategy_instance: grid_strategies.IGridStrategy = None
@@ -437,7 +437,7 @@ class ClientTrader(IClientTrader):
         control.type_keys(text, set_foreground=False)
 
     def _type_edit_control_keys(self, control_id, text):
-        if not self._editor_need_type_keys:
+        if not self.editor_need_type_keys:
             self._main.child_window(
                 control_id=control_id, class_name="Edit"
             ).set_edit_text(text)
