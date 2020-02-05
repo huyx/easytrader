@@ -63,7 +63,7 @@ class PopDialogHandler:
 class TradePopDialogHandler(PopDialogHandler):
     @perf_clock
     def handle(self, title) -> Optional[dict]:
-        if title == "委托确认":
+        if title in ["委托确认", "撤单确认"]:
             self._submit_by_shortcut()
             return None
 
