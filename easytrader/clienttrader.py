@@ -396,8 +396,8 @@ class ClientTrader(IClientTrader):
             self._config.TRADE_SECURITY_CONTROL_ID, code
         )
 
-        # wait security input finish
-        self.wait(0.1)
+        # 输入价格前，需要等待一会儿，确保价格窗口更新完毕！
+        self.wait(0.3)
 
         self._type_edit_control_keys(
             self._config.TRADE_PRICE_CONTROL_ID,
