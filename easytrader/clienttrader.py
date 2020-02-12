@@ -74,14 +74,6 @@ class ClientTrader(IClientTrader):
         self._app = None
         self._main = None
 
-    def _set_foreground(self, grid=None):
-        if grid is None:
-            grid = self._trader.main
-        if grid.has_style(pywinauto.win32defines.WS_MINIMIZE):  # if minimized
-            ShowWindow(grid.wrapper_object(), 9)  # restore window state
-        else:
-            SetForegroundWindow(grid.wrapper_object())  # bring to front
-
     @property
     def app(self):
         return self._app
@@ -442,8 +434,7 @@ class ClientTrader(IClientTrader):
         ).set_edit_text(text)
 
     def _type_common_control_keys(self, control, text):
-        self._set_foreground(control)
-        control.type_keys(text, set_foreground=False)
+        control.type_keys(text)
 
     def _type_edit_control_keys(self, control_id, text):
         if not self.editor_need_type_keys:

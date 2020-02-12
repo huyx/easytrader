@@ -50,19 +50,6 @@ class BaseStrategy(IGridStrategy):
         )
         return grid
 
-    def _set_foreground(self, grid=None):
-        try:
-            if grid is None:
-                grid = self._trader.main
-            if grid.has_style(
-                pywinauto.win32defines.WS_MINIMIZE
-            ):  # if minimized
-                ShowWindow(grid.wrapper_object(), 9)  # restore window state
-            else:
-                SetForegroundWindow(grid.wrapper_object())  # bring to front
-        except:
-            pass
-
 
 class Copy(BaseStrategy):
     """
@@ -73,8 +60,7 @@ class Copy(BaseStrategy):
 
     def get(self, control_id: int) -> List[Dict]:
         grid = self._get_grid(control_id)
-        self._set_foreground(grid)
-        grid.type_keys("^A^C", set_foreground=False)
+        grid.type_keys("^A^C")
         content = self._get_clipboard_data()
         return self._format_grid_data(content)
 
@@ -172,10 +158,7 @@ class Xls(BaseStrategy):
         grid = self._get_grid(control_id)
 
         # ctrl+s 保存 grid 内容为 xls 文件
-        self._set_foreground(
-            grid
-        )  # setFocus buggy, instead of SetForegroundWindow
-        grid.type_keys("^s", set_foreground=False)
+        grid.type_keys("^s")
         count = 10
         while count > 0:
             if self._trader.is_exist_pop_dialog():
@@ -184,16 +167,13 @@ class Xls(BaseStrategy):
             count -= 1
 
         temp_path = tempfile.mktemp(suffix=".csv")
-        self._set_foreground(self._trader.app.top_window())
 
         # alt+s保存，alt+y替换已存在的文件
         self._trader.app.top_window().Edit1.set_edit_text(
             self.normalize_path(temp_path)
         )
         self._trader.wait(0.1)
-        self._trader.app.top_window().type_keys(
-            "%{s}%{y}", set_foreground=False
-        )
+        self._trader.app.top_window().type_keys("%{s}%{y}")
         # Wait until file save complete otherwise pandas can not find file
         self._trader.wait(0.2)
         if self._trader.is_exist_pop_dialog():
