@@ -16,7 +16,6 @@ from easytrader.config import client
 from easytrader.log import logger
 from easytrader.utils.misc import file2dict
 from easytrader.utils.perf import perf_clock
-from win32gui import SetForegroundWindow, ShowWindow
 
 if not sys.platform.startswith("darwin"):
     import pywinauto
@@ -395,7 +394,7 @@ class ClientTrader(IClientTrader):
         )
 
         # 输入价格前，需要等待一会儿，确保价格窗口更新完毕！
-        self.wait(0.3)
+        self.wait(0.2)
 
         self._type_edit_control_keys(
             self._config.TRADE_PRICE_CONTROL_ID,
@@ -436,17 +435,32 @@ class ClientTrader(IClientTrader):
     def _type_common_control_keys(self, control, text):
         control.type_keys(text)
 
-    def _type_edit_control_keys(self, control_id, text):
+    def _real_type_edit_control_keys(self, edit_control, text):
         if not self.editor_need_type_keys:
-            self._main.child_window(
-                control_id=control_id, class_name="Edit"
-            ).set_edit_text(text)
+            edit_control.set_edit_text(text)
         else:
-            editor = self._main.child_window(
-                control_id=control_id, class_name="Edit"
-            )
-            editor.select()
-            editor.type_keys(text)
+            edit_control.select()
+            edit_control.type_keys(text)
+
+    def _get_edit_control_value(self, edit_control):
+        """读取编辑控件的值
+
+        这里的代码看起来有点奇怪，但“程序是调试出来的”。"""
+        texts = edit_control.texts()
+        return texts[0] or texts[1]
+
+    def _type_edit_control_keys(self, control_id, text):
+        edit_control = self._main.child_window(
+            control_id=control_id, class_name="Edit"
+        )
+
+        # 设置重试
+        retry = 3
+        while retry:
+            self._real_type_edit_control_keys(edit_control, text)
+            if self._get_edit_control_value(edit_control) == text:
+                break
+            self.wait(0.1)
 
     def _collapse_left_menus(self):
         items = self._get_left_menus_handle().roots()
