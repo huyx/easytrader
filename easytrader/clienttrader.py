@@ -333,6 +333,12 @@ class ClientTrader(IClientTrader):
     def wait(self, seconds):
         time.sleep(seconds)
 
+    def wait_pop_dialog(self, seconds):
+        end_time = time.time() + seconds
+        while time.time() < end_time:
+            if self.is_exist_pop_dialog():
+                break
+
     def exit(self):
         self._app.kill()
 
@@ -512,6 +518,10 @@ class ClientTrader(IClientTrader):
             result = handler.handle(title)
             if result:
                 return result
+
+            # 如果当前没有弹窗，就等待一会儿，有可能会有新的窗口弹出。
+            self.wait_pop_dialog(0.3)
+
         return {"message": "success"}
 
 
